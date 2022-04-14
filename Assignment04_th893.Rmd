@@ -1,0 +1,136 @@
+---
+title: "Assignment04_th893"
+author: "Tae Sik Han"
+date: "3/12/2022"
+output: 
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+```
+
+
+```{r}
+# Question 01: (5 marks)
+# Draw a rectangle with geom_path, and then geom_polygon.
+df <- data.frame(
+  x = c(1, 1, 5, 5, 1),
+  y = c(1, 5, 5, 1, 1),
+  labels = c("a", "b", "c", "d", "e")
+)
+p <- ggplot(df, aes(x, y, label = labels))
+p + geom_path()
+p + geom_polygon()
+```
+
+```{r}
+# Question 02: (5 marks)
+# Draw a five pointed star with geom_path, and then geom_polygon.
+df2 <- data.frame(
+  x = c(1,5,2,3,4,1),
+  y = c(5,5,1,6,1,5),
+  labels = c("a", "b", "c", "d", "e", "f")
+)
+p <- ggplot(df2, aes(x, y, label = labels))
+p + geom_path()
+p + geom_polygon()
+```
+
+```{r}
+# Question 03: (5 marks)
+# Using the mpg dataset, draw a freqpoly of displ, faceted by drv, into a single column. 
+# Please make sure that each facet is drawn with a different color. You must specify a binwidth that seems best, to you.
+ggplot(mpg, aes(x = displ, color = drv))+
+  geom_freqpoly(binwidth = 1)+
+  facet_grid(. ~ drv)
+```
+
+```{r}
+# Question 04: (5 marks)
+# Convert the plot in Q03, to a histogram, but with all the same parameters.
+ggplot(mpg, aes(x = displ, fill = drv))+
+  geom_histogram(binwidth = 1)+
+  facet_grid(. ~ drv)
+```
+
+```{r}
+# Question 05: (5 marks)
+# Create the following geom_density plot using data from mpg. (Use the Rstudio help!)
+ggplot(mpg, aes(x = year, fill = drv))+
+  geom_density()
+```
+
+```{r}
+# Question 06: (5 marks)
+# Recreate this bar chart with data from mpg.
+ggplot(mpg, aes(x = class))+
+  geom_bar(stat = "count", aes(fill = manufacturer))
+```
+
+```{r}
+# Question 07: (5 marks)
+# Working with your output from Q06, please set the x axis labels of class type, to a jaunty 45 degree angle.
+# You may want to adjust this line which sets the y axis labels to be upside down…
+ggplot(mpg, aes(x = class))+
+  geom_bar(stat = "count", aes(fill = manufacturer))+
+  theme(axis.text.x = element_text(angle = 45))
+
+ggplot(mpg, aes(x = class))+
+  geom_bar(stat = "count", aes(fill = manufacturer))+
+  theme(axis.text.x = element_text(angle = 45))+
+  theme(axis.text.y = element_text(angle = 180, hjust = 1))
+```
+
+```{r}
+# Question 08: (10 marks)
+# Draw a vector boundary map, by county, for a state of your choice. 
+# Here is an example of the desired output, for the state of Texas:
+library(dplyr)
+library(magrittr)
+va_counties <- map_data("county","virginia") #%>% 
+                 # select(lon=long, lat, group,id=subregion)
+va_counties <- va_counties %>%
+  rename(lon=long, id=subregion)
+ggplot(va_counties, aes(lon, lat)) +
+  geom_polygon(aes(group = group)) +
+  coord_quickmap()
+```
+
+```{r}
+# Question 09: (10 marks)
+# Color the county lines, and the counties with two different colours.
+va_counties <- map_data("county","virginia") #%>% 
+                 # select(lon=long, lat, group,id=subregion)
+va_counties <- va_counties %>%
+  rename(lon=long, id=subregion)
+ggplot(va_counties, aes(lon, lat)) +
+  geom_polygon(aes(group = group, fill = group)) +
+  coord_quickmap()
+```
+
+```{r}
+# Question 10: (20 marks)
+# Using the maps::us.cities construction to get the city population information for your chosen state, add this to your vector boundary map, as point metadata. 
+# Like the following example.
+# Please also copy the color scheme used below.
+va_cities <- maps::us.cities %>% 
+  tbl_df() %>%
+  filter(country.etc == "VA") %>%
+  rename(lon = long) %>%
+  arrange(desc(pop))
+ggplot(va_cities, aes(lon, lat)) +
+  geom_polygon(aes(group = group), va_counties, fill = NA, colour = "grey50") + 
+  geom_point(aes(size = pop), colour = "red") +
+  scale_size_area() +
+  coord_quickmap()
+```
